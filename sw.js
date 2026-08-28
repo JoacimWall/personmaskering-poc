@@ -1,14 +1,21 @@
 // T9 — cache av runtime och modell.
 //
-// TVÅ cacher, med avsikt. Skalet versioneras och byts vid varje kodändring.
-// Runtime (.wasm) och modellen (.onnx) ligger i en egen cache som INTE byts —
-// annars skulle varje rättning i koden vräka ut modellen och nollställa den
-// fyraveckorsmätning som är hela poängen med T9.
+// TVÅ strategier, med avsikt.
 //
-// Tillgångarna förcachas inte här: de hämtas först när appen körs i
-// standalone-läge och fastnar då via fetch-hanteraren. Lagringen är isolerad
-// mellan Safari och installerad app, så förcachning skulle ge två nedladdningar.
-const SKAL_CACHE = 'personmaskering-skal-v9';
+//   Skalet (HTML, JS, CSS): NÄTET FÖRST, cachen som reserv.
+//   Modellen och runtime (.onnx, .wasm): CACHEN FÖRST.
+//
+// Skälet till att skalet inte får vara cache-first: då returnerar service
+// workern gammal kod även vid en uttrycklig omladdning, och en publicerad
+// rättning når aldrig fram förrän användaren råkar starta om appen två gånger.
+// Det upptäcktes i skarpt läge 2026-08-28 — modellvalet fanns publicerat men
+// gick inte att få fram i vare sig installerad app eller webbläsarflik.
+// Skalet är omkring 40 kB; att hämta det vid varje start kostar ingenting.
+// Offline fungerar ändå, via reserven.
+//
+// Modellen ligger kvar cache-first i en egen cache som inte versioneras.
+// Det är den som T9 mäter, och en kodrättning får inte vräka ut den.
+const SKAL_CACHE = 'personmaskering-skal-v10';
 const TILLGANG_CACHE = 'personmaskering-tillgangar-v1';   // höj bara om standardmodellen byts
 const SKAL = ['./', './index.html', './style.css', './app.js', './detect.js',
               './tiling.js', './boxes.js', './mask.js', './capture.js', './t9log.js',
@@ -29,17 +36,32 @@ self.addEventListener('activate', (e) => {
   );
 });
 
-// Cache first. Modellen ändras inte, och T9 mäter just om den ligger kvar.
 self.addEventListener('fetch', (e) => {
   if (e.request.method !== 'GET') return;
-  const cacheNamn = ärTillgång(e.request.url) ? TILLGANG_CACHE : SKAL_CACHE;
-  e.respondWith(
-    caches.match(e.request).then((träff) => träff || fetch(e.request).then((svar) => {
+
+  // Modellen och runtime: cachen först. De ändras inte, och T9 mäter just om
+  // de ligger kvar.
+  if (ärTillgång(e.request.url)) {
+    e.respondWith(caches.match(e.request).then((träff) => träff || fetch(e.request).then((svar) => {
       if (svar.ok) {
         const kopia = svar.clone();
-        caches.open(cacheNamn).then((c) => c.put(e.request, kopia));
+        caches.open(TILLGANG_CACHE).then((c) => c.put(e.request, kopia));
       }
       return svar;
-    })),
+    })));
+    return;
+  }
+
+  // Skalet: nätet först, cachen som reserv när nätet saknas.
+  e.respondWith(
+    fetch(e.request)
+      .then((svar) => {
+        if (svar.ok) {
+          const kopia = svar.clone();
+          caches.open(SKAL_CACHE).then((c) => c.put(e.request, kopia));
+        }
+        return svar;
+      })
+      .catch(() => caches.match(e.request).then((träff) => träff || Promise.reject(new Error('offline')))),
   );
 });

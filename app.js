@@ -10,7 +10,7 @@ import { standalone, loggaStart, markera, exportera, sammanfatta } from './t9log
 // Höjs vid varje publicering, tillsammans med SKAL_CACHE i sw.js. Syns i
 // diagnostiken så det går att se vilken version en telefon faktiskt kör —
 // utan den är "har du fått uppdateringen?" omöjlig att svara på i fält.
-const VERSION = '2026-08-28.4';
+const VERSION = '2026-08-28.5';
 
 const $ = (id) => document.getElementById(id);
 const MATNING = new URLSearchParams(location.search).has('matning');

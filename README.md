@@ -34,10 +34,13 @@ När den är klar ser du den maskerade bilden och kan ladda ner den.
 Under **Diagnostik** finns tekniska detaljer, versionsnummer, modellval och ett
 självtest.
 
-**Får du inte en ny version?** Appen cachar sig själv för att fungera offline.
-Stäng den helt — svep bort den ur appväxlaren — och öppna igen. Kontrollera
-versionsnumret under Diagnostik. Från och med version 2026-08-28.4 laddar appen
-om sig själv automatiskt när en ny version hämtats.
+**Versionsnumret** står under Diagnostik. Från och med 2026-08-28.5 räcker en
+vanlig omladdning för att få en ny version — appen hämtar sin egen kod från
+nätet och använder cachen bara som reserv när nätet saknas. Modellen ligger kvar
+cachad och laddas inte om.
+
+Sitter du kvar på en äldre version: stäng appen helt, svep bort den ur
+appväxlaren och öppna igen. Det behövs bara den här enda gången.
 
 ## Vad som är värt att rapportera
 
