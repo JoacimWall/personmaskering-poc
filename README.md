@@ -20,31 +20,18 @@ pixelering går att återvinna — en konstant svart yta gör det inte.
 
 Öppna länken i webbläsaren på telefonen.
 
-1. Tryck **Ladda modell**. Cirka 5 MB hämtas första gången, sedan ligger den
-   kvar i cachen.
-2. Tryck **Starta kamera** och godkänn behörigheten.
-3. Tryck **Ta foto och maskera**. Det tar några sekunder — 14 inferenser körs
-   över bilden.
-4. Tryck **Ladda ner maskad bild** om du vill spara den.
+**Lägg först appen på hemskärmen.** Appen visar hur. Gör det innan du tar första
+bilden — lagringen är skild mellan webbläsaren och en installerad app, så annars
+laddas modellen ner två gånger. Det fungerar även utan, det blir bara en extra
+nedladdning.
 
-Vill du lägga appen på hemskärmen: gör det **innan** du laddar modellen. Lagringen
-är isolerad mellan webbläsaren och en installerad app, annars hämtas modellen två
-gånger.
+Sedan: **Ta foto** eller **Välj bild från telefonen**. Första gången hämtas
+modellen, cirka 5 MB, sedan ligger den kvar. Maskeringen tar några sekunder —
+fjorton genomsökningar körs över bilden, och räknaren visar hur långt den kommit.
 
-**Självtest** kontrollerar att maskeringen och boxsammanslagningen fungerar.
-Resultatet visas i statusraden.
+När den är klar ser du den maskerade bilden och kan ladda ner den.
 
-## Inställningar
-
-| Reglage | Vad det gör |
-|---|---|
-| Tröskel | Hur säker detektorn måste vara. Lägre hittar fler, maskerar mer. |
-| Utvidgning | Marginal runt varje region. |
-| Max regionstorlek | Kastar regioner över en viss andel av bilden. **Avstängt, och bör förbli det** — det kan skära sönder en verklig person. |
-| Tiling | Delar bilden i rutor och kör detektorn på varje. Hittar personer långt bort, men tar cirka tio gånger längre tid. |
-
-Under resultatet visas hur många regioner som maskerats, hur stor den största är
-och hur lång tid det tog.
+Under **Diagnostik** finns tekniska detaljer och ett självtest, om du vill se dem.
 
 ## Vad som är värt att rapportera
 
@@ -72,5 +59,11 @@ ett beslut — inte att vara färdigt.
 | [D-FINE-N](https://huggingface.co/ustc-community/dfine_n_coco) (COCO, int8 ONNX) | Apache-2.0 — `models/LICENSE-model.txt` |
 
 Modellens ursprung och verifierade grafspecifikation: `models/SOURCE.txt`.
+
+## För mätningar
+
+`?matning=1` i adressen visar reglage för tröskel, utvidgning, storlekstak och
+tiling, samt regionstatistik under resultatet. Standardläget kör den
+konfiguration mätningarna landade i: tiling på, tröskel 0,12, inget storlekstak.
 
 Ingen bundler, inget byggsteg, inga körtidsberoenden.

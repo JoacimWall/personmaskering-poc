@@ -65,7 +65,9 @@ export async function maskImage(source, opts = {}) {
     }
     // Läs måtten INNAN källan släpps — en stängd ImageBitmap rapporterar 0.
     const bredd = source.width, höjd = source.height;
+    opts.onProgress?.(null, null, 'detekterar');
     const det = await Promise.race([detectPersons(source, opts), timeout(opts.timeoutMs ?? TIMEOUT_MS)]);
+    opts.onProgress?.(null, null, 'maskerar');
     const canvas = drawMasked(source, det.boxes);
     const kodad = await canvas.convertToBlob({ type: 'image/jpeg', quality: opts.quality ?? JPEG_QUALITY });
     const blob = await strippaMetadata(kodad);

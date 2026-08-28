@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>PoC personmaskering</title>
+<title>Personmaskering</title>
 <link rel="stylesheet" href="style.css">
 <link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="icon-192.png">
@@ -12,10 +12,58 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 </head>
 <body>
-<h1>PoC personmaskering</h1>
 
-<section id="runtime" class="panel">
-  <h2>Runtime</h2>
+<header>
+  <h1>Personmaskering</h1>
+  <p class="ingress">Personer i bilden svärtas över direkt på telefonen.
+    Bilden skickas ingenstans.</p>
+</header>
+
+<section class="kort installera" id="installera" hidden>
+  <h2>Lägg till på hemskärmen först</h2>
+  <p>Gör det <strong>innan</strong> du tar första bilden. Lagringen är skild mellan
+    webbläsaren och en installerad app, annars laddas modellen ner två gånger.</p>
+  <ol id="installera-steg"></ol>
+  <p class="sekundar">Du kan testa direkt i webbläsaren också — det fungerar,
+    det blir bara en extra nedladdning.</p>
+</section>
+
+<section class="kort">
+  <div id="val">
+    <button id="ta-foto" class="stor">Ta foto</button>
+    <button id="valj-bild" class="stor sekundar-knapp">Välj bild från telefonen</button>
+    <input type="file" id="fil" accept="image/*" hidden>
+  </div>
+
+  <div id="kamera" hidden>
+    <video id="video" playsinline muted></video>
+    <button id="fotografera" class="stor">Fotografera och maskera</button>
+    <button id="avbryt" class="lank">Avbryt</button>
+  </div>
+
+  <p id="status" role="status"></p>
+</section>
+
+<section class="kort" id="resultat" hidden>
+  <h2 id="resultat-rubrik"></h2>
+  <p id="resultat-text"></p>
+  <img id="forhandsvisning" alt="Maskerad bild">
+  <button id="ladda-ner" class="stor">Ladda ner bilden</button>
+  <button id="igen" class="lank">Ta en till</button>
+</section>
+
+<section class="kort" id="installningar" hidden>
+  <h2>Mätinställningar</h2>
+  <p class="sekundar">Synliga för att <code>?matning=1</code> är satt.</p>
+  <label>Tröskel <input type="range" id="threshold" min="0.05" max="0.5" step="0.01" value="0.12"><output id="threshold-out">0.12</output></label>
+  <label>Utvidgning <input type="range" id="expand" min="0" max="0.4" step="0.01" value="0.18"><output id="expand-out">0.18</output></label>
+  <label>Max regionstorlek <input type="range" id="maxandel" min="0.05" max="1" step="0.05" value="1"><output id="maxandel-out">av</output></label>
+  <label><input type="checkbox" id="tiling" checked> Tiling (helbild + 2×2 + 3×3)</label>
+  <p id="regioner" class="sekundar"></p>
+</section>
+
+<details class="kort">
+  <summary>Diagnostik</summary>
   <dl>
     <dt>ort-version</dt><dd id="ort-version">–</dd>
     <dt>Provider</dt><dd id="provider">–</dd>
@@ -23,46 +71,22 @@
     <dt>In/ut</dt><dd id="io-names">–</dd>
     <dt>Läge</dt><dd id="display-mode">–</dd>
   </dl>
-  <button id="init">Ladda modell</button>
-  <button id="selftest">Självtest</button>
-</section>
-
-<section class="panel">
-  <h2>Bild</h2>
-  <button id="start-cam">Starta kamera</button>
-  <button id="shoot" disabled>Ta foto och maskera</button>
-  <input type="file" id="file" accept="image/*">
-  <video id="video" playsinline muted></video>
-</section>
-
-<section class="panel">
-  <h2>Inställningar</h2>
-  <label>Tröskel <input type="range" id="threshold" min="0.05" max="0.5" step="0.01" value="0.12"><output id="threshold-out">0.12</output></label>
-  <label>Utvidgning <input type="range" id="expand" min="0" max="0.4" step="0.01" value="0.18"><output id="expand-out">0.18</output></label>
-  <label>Max regionstorlek <input type="range" id="maxandel" min="0.05" max="1" step="0.05" value="1"><output id="maxandel-out">av</output></label>
-  <label><input type="checkbox" id="tiling" checked> Tiling (helbild + 2×2 + 3×3)</label>
-</section>
-
-<section class="panel" id="t9">
-  <h2>T9 — startlogg</h2>
-  <p id="t9-rad"></p>
-  <p id="t9-sammanfattning"></p>
+  <p id="t9-rad" class="sekundar"></p>
+  <p id="t9-sammanfattning" class="sekundar"></p>
   <p>Frågade kameran om lov vid den här starten?
-    <button id="kam-ja">Ja</button>
-    <button id="kam-nej">Nej</button>
+    <button id="kam-ja" class="lank">Ja</button>
+    <button id="kam-nej" class="lank">Nej</button>
   </p>
-  <button id="t9-export">Exportera logg (JSON)</button>
-</section>
+  <button id="t9-export" class="lank">Exportera startlogg</button>
+  <button id="selftest" class="lank">Kör självtest</button>
+</details>
 
-<section class="panel">
-  <h2>Resultat</h2>
-  <p id="status">Väntar.</p>
-  <p id="metrics"></p>
-  <p id="regioner"></p>
-  <p id="geo"></p>
-  <button id="download" hidden>Ladda ner maskad bild</button>
-  <canvas id="preview"></canvas>
-</section>
+<footer>
+  <p>Maskeringen är opak ifyllnad, inte oskärpa. Oskärpa och pixelering går att
+    återvinna — en konstant svart yta gör det inte.</p>
+  <p>All metadata tas bort ur den sparade bilden: position, enhet, tidsstämpel
+    och den inbäddade miniatyr som annars visar originalet.</p>
+</footer>
 
 <script type="module" src="app.js"></script>
 </body>
