@@ -1,0 +1,36 @@
+Modell: D-FINE-N (COCO), int8 ONNX
+Fil:    dfine_n_coco_int8.onnx
+Hämtad: https://huggingface.co/onnx-community/dfine_n_coco-ONNX/resolve/main/onnx/model_int8.onnx
+Datum:  2026-08-28
+Basmodell: https://huggingface.co/ustc-community/dfine_n_coco
+Licens: Apache-2.0 (kod och vikter) — se LICENSE-model.txt
+
+Graf (verifierad med onnx.load, inte antagen):
+  input  pixel_values [batch, 3, height, width] float32
+  output logits       [batch, 300, 80] float32   (sigmoid per klass, ingen bakgrundsklass)
+  output pred_boxes   [batch, 300, 4]  float32   (cx, cy, w, h — normaliserade 0..1)
+Ingen NMS i grafen. DETR-familjen behöver ingen NMS för ett helbildspass;
+NMS behövs bara för att slå ihop boxar över rutgränser vid tiling (T3).
+
+preprocessor_config.json: resize 640x640 (bevarar inte proportioner), do_rescale=true
+(1/255), do_normalize=FALSE, do_pad=false. Alltså ingen mean/std-normalisering.
+
+COCO-klass 0 = person.
+
+Verifierat 2026-08-28 med onnxruntime-node på COCO val2017 (se tools/smoke-detect.mjs):
+  000000000785.jpg (en skidåkare): person hittad, box 284,46 197x343, score 0,62
+  000000000724.jpg (stoppskylt, inga personer): 0 personer även vid tröskel 0,10
+  ~40 ms per inferens på skrivbord. Telefon mäts i T8.
+
+RÄTTELSE till noten ovan: exporten ger nära dubbletter av samma person redan i
+ETT helbildspass vid låg tröskel (0,621 och 0,627 på samma skidåkare). NMS behövs
+alltså även utan tiling, inte bara över rutgränser. detectPersons() kör därför
+NMS på allt.
+
+Vid tröskel 0,12 kommer också 3–5 px stora skenboxar (score 0,2–0,38). De är
+ofarliga att maskera men de blåser upp antalet regioner. Om T8 visar att de stör
+mätningen är ett minsta-area-filter rätt plats att lägga in det.
+
+int8-kvantiseringen ger låga toppscore (0,62 på en oskymd person i förgrunden).
+Det talar för den låga tröskeln i arbetsplanen — tröskel 0,25 är redan hög för
+den här modellen.

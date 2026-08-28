@@ -1,0 +1,15 @@
+:root { color-scheme: light dark; font-family: system-ui, sans-serif; }
+body { margin: 0 auto; padding: 1rem; max-width: 40rem; line-height: 1.5; }
+h1 { font-size: 1.3rem; }
+h2 { font-size: 1rem; margin: 0 0 .5rem; }
+.panel { border: 1px solid currentColor; border-radius: .5rem; padding: .75rem; margin-bottom: 1rem; opacity: .95; }
+dl { display: grid; grid-template-columns: auto 1fr; gap: .2rem .75rem; margin: 0; font-size: .9rem; }
+dt { opacity: .7; } dd { margin: 0; font-variant-numeric: tabular-nums; }
+button, input[type=file] { font: inherit; padding: .5rem .75rem; margin: .25rem .25rem .25rem 0; }
+button { border-radius: .4rem; }
+label { display: block; margin: .4rem 0; }
+video, canvas { width: 100%; max-height: 50vh; object-fit: contain; background: #0002; border-radius: .4rem; }
+video:not([srcobject]) { display: block; }
+#status.fail { color: #c00; font-weight: 600; }
+#status.ok { color: #070; font-weight: 600; }
+#metrics, #geo { font-size: .85rem; font-variant-numeric: tabular-nums; opacity: .8; margin: .25rem 0; }
