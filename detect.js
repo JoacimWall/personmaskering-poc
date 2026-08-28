@@ -2,7 +2,27 @@
 // Grafen är verifierad mot models/SOURCE.txt, inte antagen.
 import * as ort from './vendor/ort.wasm.min.mjs';
 
-const MODEL_URL = './models/dfine_n_coco_int8.onnx';
+// Två varianter ur samma familj — identisk graf, identisk preprocess, bara
+// olika storlek.
+//
+// S är träffsäkrare på just det som är svårt: med N överlappar falsklarmens
+// score (0,16-0,19) de små skymda personernas (0,13-0,35), vilket tvingar fram
+// tröskel 0,12 och maskerar då trädstammar och älgar. S separerar dem och gör
+// tröskel 0,25 användbar, med noll falsklarm på samma bilder.
+//
+// N är ändå standard, av ett skäl som bara syns i rätt runtime: i webbläsarens
+// WASM är S 3,12 gånger långsammare, inte 1,78 som onnxruntime-node antyder.
+// Uppmätt 2026-08-28: 603 ms mot 1880 ms per inferens, alltså 8,4 s mot 26,3 s
+// för en bild med full tiling — omkring 21 s på en iPhone. Det är inte en
+// användbar tjänst.
+//
+// ?modell=s väljer S, så T8 kan mäta båda på riktig telefon.
+// Underlag: resultat/matning-modellstorlek.md
+export const MODELLER = {
+  n: { fil: './models/dfine_n_coco_int8.onnx', troskel: 0.12, namn: 'D-FINE-N' },
+  s: { fil: './models/dfine_s_coco_int8.onnx', troskel: 0.25, namn: 'D-FINE-S' },
+};
+const VALD = MODELLER[new URLSearchParams(location.search).get('modell')] ?? MODELLER.n;
 const INPUT_SIZE = 640;      // preprocessor_config.json: size 640x640, do_pad=false
 const PERSON_CLASS = 0;      // COCO
 const NUM_CLASSES = 80;
@@ -16,12 +36,15 @@ ort.env.wasm.proxy = false;
 let session = null;
 let inputName = null;
 
-export const runtimeInfo = { ortVersion: ort.env.versions?.web ?? 'okänd', provider: null, initMs: null };
+export const runtimeInfo = {
+  ortVersion: ort.env.versions?.web ?? 'okänd', provider: null, initMs: null,
+  modell: VALD.namn, standardTroskel: VALD.troskel,
+};
 
 export async function initDetector() {
   if (session) return runtimeInfo;
   const t0 = performance.now();
-  session = await ort.InferenceSession.create(MODEL_URL, {
+  session = await ort.InferenceSession.create(VALD.fil, {
     executionProviders: ['wasm'],
     graphOptimizationLevel: 'all',
   });

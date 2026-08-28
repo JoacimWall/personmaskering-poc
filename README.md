@@ -48,6 +48,8 @@ ett beslut — inte att vara färdigt.
 
 - Ingen artbestämning, ingen lagring, ingen uppladdning. Endast maskering.
 - Detektorn tappar säkerhet på personer mindre än cirka 80 px i bilden.
+- Trädstammar och djur maskeras ibland av misstag. Det är avsiktligt: tröskeln
+  är satt lågt för att hellre maskera för mycket än missa en människa.
 - iOS sparar inte alltid nedladdningen direkt; bilden kan öppnas i stället, och
   då får du långtrycka för att spara.
 
@@ -56,9 +58,28 @@ ett beslut — inte att vara färdigt.
 | Komponent | Licens |
 |---|---|
 | [onnxruntime-web](https://github.com/microsoft/onnxruntime) 1.29.0 | MIT — `vendor/LICENSE-onnxruntime.txt` |
-| [D-FINE-N](https://huggingface.co/ustc-community/dfine_n_coco) (COCO, int8 ONNX) | Apache-2.0 — `models/LICENSE-model.txt` |
+| [D-FINE-N och -S](https://huggingface.co/ustc-community/dfine_n_coco) (COCO, int8 ONNX) | Apache-2.0 — `models/LICENSE-model.txt` |
 
 Modellens ursprung och verifierade grafspecifikation: `models/SOURCE.txt`.
+
+## Två modeller
+
+Appen kör **D-FINE-N** som standard. **D-FINE-S** väljs med `?modell=s` i
+adressen.
+
+| | N (standard) | S |
+|---|---|---|
+| Nedladdning | 2,5 MB | 6,7 MB |
+| Tid per foto på telefon | cirka 7 s | **cirka 21 s** |
+| Falska områden på en bild utan personer | fler | **noll** |
+
+S är träffsäkrare — den maskerar inte trädstammar och älgar, och den hittar
+delvis skymda personer med god marginal. Men den är tre gånger långsammare i
+webbläsaren, vilket gör den obrukbar i fält. Den finns med för att kunna
+jämföras på riktiga bilder.
+
+Ser du att N maskerar för mycket i en viss bild, prova samma bild med
+`?modell=s` och jämför.
 
 ## För mätningar
 

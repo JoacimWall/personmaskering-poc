@@ -34,3 +34,22 @@ mätningen är ett minsta-area-filter rätt plats att lägga in det.
 int8-kvantiseringen ger låga toppscore (0,62 på en oskymd person i förgrunden).
 Det talar för den låga tröskeln i arbetsplanen — tröskel 0,25 är redan hög för
 den här modellen.
+
+--- D-FINE-S, tillagd 2026-08-28 ---
+Fil:    dfine_s_coco_int8.onnx
+Hämtad: https://huggingface.co/onnx-community/dfine_s_coco-ONNX/resolve/main/onnx/model_int8.onnx
+Basmodell: https://huggingface.co/ustc-community/dfine_s_coco
+Licens: Apache-2.0
+
+Identisk graf och identisk preprocessor_config som N — verifierad, inte antagen.
+
+Träffsäkrare på det som är svårt: marginalen mellan svåraste personen och
+värsta falsklarmet är 0,45 mot N:s 0,16, vilket gör tröskel 0,25 användbar och
+ger noll falsklarm på bilder utan personer.
+
+Men i webbläsarens WASM kostar den 3,12 gånger N per inferens — 1880 ms mot
+603 ms — vilket ger cirka 21 sekunder per foto på en telefon. Därför är N
+standard och S väljs med ?modell=s.
+
+Observera: onnxruntime-node ger kostnaden 1,78 gånger. Den siffran gäller inte
+i webbläsaren. Mät latens i den runtime som ska köra koden.

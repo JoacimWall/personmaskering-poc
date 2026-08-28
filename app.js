@@ -10,15 +10,16 @@ import { standalone, loggaStart, markera, exportera, sammanfatta } from './t9log
 const $ = (id) => document.getElementById(id);
 const MATNING = new URLSearchParams(location.search).has('matning');
 
-// Rekommenderad konfiguration efter mätningarna 2026-08-28: tiling på,
-// tröskel 0,12, inget storlekstak. Se README i projektet för underlaget.
-const STANDARD = { threshold: 0.12, expandFrac: 0.18, grids: [1, 2, 3], maxAndel: 1 };
+// Tiling på, inget storlekstak. Tröskeln följer modellen: N behöver 0,12,
+// S klarar 0,25 och slipper då falsklarmen på trädstammar. Se
+// resultat/matning-modellstorlek.md.
+const STANDARD = { expandFrac: 0.18, grids: [1, 2, 3], maxAndel: 1 };
 
 let bloben = null;
 let initierad = false;
 
 function options() {
-  if (!MATNING) return { ...STANDARD };
+  if (!MATNING) return { ...STANDARD, threshold: runtimeInfo.standardTroskel };
   return {
     threshold: +$('threshold').value,
     expandFrac: +$('expand').value,
@@ -55,6 +56,7 @@ async function säkerställModell() {
     await initDetector();
     initierad = true;
     $('ort-version').textContent = runtimeInfo.ortVersion;
+    $('modell').textContent = `${runtimeInfo.modell} int8, tröskel ${runtimeInfo.standardTroskel}`;
     $('provider').textContent = runtimeInfo.provider;
     $('init-ms').textContent = `${runtimeInfo.initMs} ms`;
     $('io-names').textContent = `${runtimeInfo.inputNames} → ${runtimeInfo.outputNames}`;
@@ -196,6 +198,8 @@ function visaInstallation() {
   $('t9-sammanfattning').textContent = sammanfatta();
 
   if (MATNING) {
+    $('threshold').value = runtimeInfo.standardTroskel || 0.25;
+    $('threshold-out').value = $('threshold').value;
     for (const [id, ut] of [['threshold', 'threshold-out'], ['expand', 'expand-out']]) {
       $(id).oninput = () => ($(ut).value = $(id).value);
     }
