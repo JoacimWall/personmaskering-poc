@@ -39,8 +39,14 @@ vanlig omladdning för att få en ny version — appen hämtar sin egen kod frå
 nätet och använder cachen bara som reserv när nätet saknas. Modellen ligger kvar
 cachad och laddas inte om.
 
-Sitter du kvar på en äldre version: stäng appen helt, svep bort den ur
-appväxlaren och öppna igen. Det behövs bara den här enda gången.
+**Fastnat på en gammal version?** Öppna Diagnostik och tryck **Nollställ
+appen**. Den avregistrerar service workern, tömmer cachen och laddar om.
+Modellen hämtas då om, cirka 5 MB.
+
+Går inte ens det — appen är så gammal att knappen saknas — radera webbplatsdata
+för `joacimwall.github.io` i webbläsarens inställningar, eller ta bort appen från
+hemskärmen och lägg till den på nytt. Det gäller bara versioner före
+2026-08-28.5.
 
 ## Vad som är värt att rapportera
 

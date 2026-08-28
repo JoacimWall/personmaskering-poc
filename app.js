@@ -10,7 +10,7 @@ import { standalone, loggaStart, markera, exportera, sammanfatta } from './t9log
 // Höjs vid varje publicering, tillsammans med SKAL_CACHE i sw.js. Syns i
 // diagnostiken så det går att se vilken version en telefon faktiskt kör —
 // utan den är "har du fått uppdateringen?" omöjlig att svara på i fält.
-const VERSION = '2026-08-28.5';
+const VERSION = '2026-08-28.6';
 
 const $ = (id) => document.getElementById(id);
 const MATNING = new URLSearchParams(location.search).has('matning');
@@ -175,6 +175,24 @@ $('modellval').onchange = () => {
   else p.set('modell', $('modellval').value);
   location.search = p.toString();
 };
+// Sista utvägen när en gammal service worker vägrar lämna plats. Utan den
+// finns ingen väg tillbaka från en trasig publicering annat än att radera
+// webbplatsdata i systeminställningarna — vilket ingen kollega gör i fält.
+$('nollstall').onclick = async () => {
+  status('Nollställer…');
+  try {
+    const reg = await navigator.serviceWorker?.getRegistrations?.() ?? [];
+    await Promise.all(reg.map((r) => r.unregister()));
+    const namn = await caches.keys();
+    await Promise.all(namn.map((n) => caches.delete(n)));
+    sessionStorage.removeItem('laddat-om');
+    status(`Nollställd: ${reg.length} service worker, ${namn.length} cache. Laddar om…`);
+    setTimeout(() => location.reload(), 800);
+  } catch (e) {
+    status(`Nollställning misslyckades: ${e.message}`, 'fel');
+  }
+};
+
 $('selftest').onclick = async () => {
   const r = [tilingDemo(), await maskDemo()];
   status(`${r.join(' · ')} — eventuella fel syns i konsolen`);

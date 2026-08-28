@@ -15,7 +15,7 @@
 //
 // Modellen ligger kvar cache-first i en egen cache som inte versioneras.
 // Det är den som T9 mäter, och en kodrättning får inte vräka ut den.
-const SKAL_CACHE = 'personmaskering-skal-v10';
+const SKAL_CACHE = 'personmaskering-skal-v11';
 const TILLGANG_CACHE = 'personmaskering-tillgangar-v1';   // höj bara om standardmodellen byts
 const SKAL = ['./', './index.html', './style.css', './app.js', './detect.js',
               './tiling.js', './boxes.js', './mask.js', './capture.js', './t9log.js',
