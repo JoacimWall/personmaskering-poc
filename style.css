@@ -76,5 +76,8 @@ details dl {
 details dt { opacity: .65; }
 details dd { margin: 0; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 label { display: block; margin: .5rem 0; }
+select { font: inherit; padding: .5rem; border-radius: .4rem; max-width: 100%;
+         background: transparent; color: inherit; border: 1px solid var(--kant); }
+details label { display: inline; margin-right: .5rem; font-weight: 600; }
 footer { font-size: .85rem; opacity: .7; }
 footer p { margin: .5rem 0; }

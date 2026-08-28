@@ -8,7 +8,7 @@
 // Tillgångarna förcachas inte här: de hämtas först när appen körs i
 // standalone-läge och fastnar då via fetch-hanteraren. Lagringen är isolerad
 // mellan Safari och installerad app, så förcachning skulle ge två nedladdningar.
-const SKAL_CACHE = 'personmaskering-skal-v7';
+const SKAL_CACHE = 'personmaskering-skal-v8';
 const TILLGANG_CACHE = 'personmaskering-tillgangar-v1';   // höj bara om standardmodellen byts
 const SKAL = ['./', './index.html', './style.css', './app.js', './detect.js',
               './tiling.js', './boxes.js', './mask.js', './capture.js', './t9log.js',

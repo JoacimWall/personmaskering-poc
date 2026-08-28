@@ -78,8 +78,12 @@ delvis skymda personer med god marginal. Men den är tre gånger långsammare i
 webbläsaren, vilket gör den obrukbar i fält. Den finns med för att kunna
 jämföras på riktiga bilder.
 
-Ser du att N maskerar för mycket i en viss bild, prova samma bild med
-`?modell=s` och jämför.
+**Byt modell i appen:** öppna **Diagnostik** längst ned och välj i listan.
+Appen laddas om, och första bytet till S hämtar 6,7 MB. Det går också att skriva
+`?modell=s` i adressen.
+
+Ser du att N maskerar för mycket i en viss bild — trädstammar, djur — prova
+samma bild med S och jämför.
 
 ## För mätningar
 

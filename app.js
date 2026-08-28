@@ -161,6 +161,15 @@ $('igen').onclick = () => { $('resultat').hidden = true; status(''); };
 $('kam-ja').onclick = () => { markera(true); $('t9-sammanfattning').textContent = sammanfatta(); };
 $('kam-nej').onclick = () => { markera(false); $('t9-sammanfattning').textContent = sammanfatta(); };
 $('t9-export').onclick = exportera;
+
+// Modellen väljs vid sessionens start, så bytet kräver omladdning.
+// Övriga parametrar behålls så ?matning=1 inte tappas bort.
+$('modellval').onchange = () => {
+  const p = new URLSearchParams(location.search);
+  if ($('modellval').value === 'n') p.delete('modell');
+  else p.set('modell', $('modellval').value);
+  location.search = p.toString();
+};
 $('selftest').onclick = async () => {
   const r = [tilingDemo(), await maskDemo()];
   status(`${r.join(' · ')} — eventuella fel syns i konsolen`);
@@ -186,6 +195,7 @@ function visaInstallation() {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').catch((e) => console.warn('sw:', e.message));
   }
+  $('modellval').value = new URLSearchParams(location.search).get('modell') === 's' ? 's' : 'n';
   $('installningar').hidden = !MATNING;
   visaInstallation();
 
