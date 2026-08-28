@@ -7,6 +7,11 @@ import { demo as tilingDemo } from './tiling.js';
 import { startCamera, stopCamera, grabFrame, fromFile, position } from './capture.js';
 import { standalone, loggaStart, markera, exportera, sammanfatta } from './t9log.js';
 
+// Höjs vid varje publicering, tillsammans med SKAL_CACHE i sw.js. Syns i
+// diagnostiken så det går att se vilken version en telefon faktiskt kör —
+// utan den är "har du fått uppdateringen?" omöjlig att svara på i fält.
+const VERSION = '2026-08-28.4';
+
 const $ = (id) => document.getElementById(id);
 const MATNING = new URLSearchParams(location.search).has('matning');
 
@@ -194,7 +199,17 @@ function visaInstallation() {
 (async () => {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').catch((e) => console.warn('sw:', e.message));
+    // En ny service worker tar över med skipWaiting + claim, men sidan som redan
+    // ritats kommer fortfarande från det gamla skalet. Utan den här omladdningen
+    // sitter en installerad app kvar på en gammal version tills användaren
+    // råkar starta om den två gånger.
+    navigator.serviceWorker.addEventListener('controllerchange', () => {
+      if (sessionStorage.getItem('laddat-om')) return;   // en gång, aldrig i loop
+      sessionStorage.setItem('laddat-om', '1');
+      location.reload();
+    });
   }
+  $('version').textContent = VERSION;
   $('modellval').value = new URLSearchParams(location.search).get('modell') === 's' ? 's' : 'n';
   $('installningar').hidden = !MATNING;
   visaInstallation();

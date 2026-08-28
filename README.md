@@ -31,7 +31,13 @@ fjorton genomsökningar körs över bilden, och räknaren visar hur långt den k
 
 När den är klar ser du den maskerade bilden och kan ladda ner den.
 
-Under **Diagnostik** finns tekniska detaljer och ett självtest, om du vill se dem.
+Under **Diagnostik** finns tekniska detaljer, versionsnummer, modellval och ett
+självtest.
+
+**Får du inte en ny version?** Appen cachar sig själv för att fungera offline.
+Stäng den helt — svep bort den ur appväxlaren — och öppna igen. Kontrollera
+versionsnumret under Diagnostik. Från och med version 2026-08-28.4 laddar appen
+om sig själv automatiskt när en ny version hämtats.
 
 ## Vad som är värt att rapportera
 
